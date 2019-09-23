@@ -38,5 +38,21 @@ def users(id=None):
        return jsonify(user.serialize()), 201
 
 
+    if request.method == 'PUT':
+        if id is not None:
+            user = User.query.get(id)
+            user.name = request.json.get('name')
+            db.session.commit()
+            return jsonify(user.serialize()), 201
+    
+    if request.method == 'DELETE':
+        if id is not None:
+            user = User.query.get(id)
+            db.session.delete(user)
+            db.session.commit()
+            return jsonify({"message":"object deleted"}), 200
+
+
+
 if __name__ == '__main__':
     Manager.run()
