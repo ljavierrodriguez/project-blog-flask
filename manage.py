@@ -25,7 +25,10 @@ def users(id=None):
     if request.method == 'GET':
         if id is not None:
             user = User.query.get(id)
-            return jsonify(user.serialize()), 200
+            if user:
+                return jsonify(user.serialize()), 200
+            else:
+                return jsonify({"error":"not found"}), 404
         else:
             users = User.query.all()
             json_list=[user.serialize() for user in users]
