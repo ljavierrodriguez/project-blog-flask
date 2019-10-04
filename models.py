@@ -6,6 +6,8 @@ class User(db.Model):
     __tablename__='users'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)
+    username = db.Column(db.String(120), nullable=False)
+    password = db.Column(db.String(120), nullable=False)
     addresses = db.relationship('Address', backref='user', lazy=True)
     def __repr__(self):
         return '<User %r>' % self.name
@@ -18,6 +20,7 @@ class User(db.Model):
         return {
             "id": self.id,
             "name": self.name,
+            "username": self.username,
             "addresses": json_list
         }
 

@@ -3,9 +3,25 @@ from flask import Flask, jsonify, request
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 from flask_mail import Mail, Message
+
+from flask_jwt import JWT, jwt_required, current_identity
+from werkzeug.security import safe_str_cmp
+
 from models import db, User, Address
 
+import datetime
+
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
+
+def authenticate(username, password):
+    user = User.query.filter_by(username=username).first()
+    if user and safe_str_cmp(user.password.encode('utf-8'), password.encode('utf-8')):
+        return user
+
+def identity(payload):
+    user_id = payload['identity']
+    return User.query.get(user_id)
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret-key'
@@ -16,9 +32,10 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['MAIL_SERVER']='smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USERNAME'] = 'ljavierrodriguez@gmail.com'
-app.config['MAIL_PASSWORD'] = ''
+app.config['MAIL_PASSWORD'] = 'anbprtftsbdsgdam'
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
+app.config['JWT_EXPIRATION_DELTA'] = datetime.timedelta(days=3)
 db.init_app(app)
 
 '''
@@ -37,6 +54,8 @@ MAIL_ASCII_ATTACHMENTS : default False
 
 mail = Mail()
 mail.init_app(app)
+
+jwt = JWT(app, authenticate, identity)
 
 Migrate = Migrate(app, db)
 
@@ -59,7 +78,10 @@ def users(id=None):
             return jsonify(json_list), 200
 
     if request.method == 'POST':
-       user = User(name=request.json.get('name'))
+       user = User(
+           name=request.json.get('name'), 
+           username=request.json.get('username'),
+           password=request.json.get('password'))
        db.session.add(user)
        db.session.commit()
        return jsonify(user.serialize()), 201
@@ -69,6 +91,8 @@ def users(id=None):
         if id is not None:
             user = User.query.get(id)
             user.name = request.json.get('name')
+            if request.json.get('password'):
+                user.password = request.json.get('password')
             db.session.commit()
             return jsonify(user.serialize()), 201
     
@@ -82,6 +106,7 @@ def users(id=None):
 
 @app.route('/addresses', methods=['GET', 'POST'])
 @app.route('/addresses/<int:id>', methods=['GET', 'PUT', 'DELETE'])
+@jwt_required()
 def addresses(id=None):
     if request.method == 'GET':
         if id is not None:
