@@ -62,6 +62,19 @@ Migrate = Migrate(app, db)
 Manager = Manager(app)
 Manager.add_command('db', MigrateCommand)
 
+
+@app.route('/register', methods=['POST'])
+def register():
+    if request.method=='POST':
+        user = User(
+           name=request.json.get('name'), 
+           username=request.json.get('username'),
+           password=request.json.get('password')
+        )
+        db.session.add(user)
+        db.session.commit()
+        return jsonify({"message":"registro exitoso"}), 201
+
 @app.route('/users', methods=['GET', 'POST'])
 @app.route('/users/<int:id>', methods=['GET', 'PUT', 'DELETE'])
 def users(id=None):
