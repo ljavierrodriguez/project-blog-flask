@@ -3,6 +3,7 @@ from flask import Flask, jsonify, request
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 from flask_mail import Mail, Message
+from flask_cors import CORS
 
 from flask_jwt import JWT, jwt_required, current_identity
 from werkzeug.security import safe_str_cmp
@@ -37,6 +38,7 @@ app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 app.config['JWT_EXPIRATION_DELTA'] = datetime.timedelta(days=3)
 db.init_app(app)
+CORS(app)
 
 '''
 MAIL_SERVER : default ‘localhost’

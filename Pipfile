@@ -12,6 +12,7 @@ flask-migrate = "*"
 flask-jwt = "*"
 flask-script = "*"
 flask-mail = "*"
+flask-cors = "*"
 
 [requires]
 python_version = "3.6"

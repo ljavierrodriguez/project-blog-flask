@@ -9,6 +9,7 @@ class User(db.Model):
     username = db.Column(db.String(120), nullable=False)
     password = db.Column(db.String(120), nullable=False)
     addresses = db.relationship('Address', backref='user', lazy=True)
+    
     def __repr__(self):
         return '<User %r>' % self.name
 
