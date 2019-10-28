@@ -33,7 +33,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['MAIL_SERVER']='smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USERNAME'] = 'ljavierrodriguez@gmail.com'
-app.config['MAIL_PASSWORD'] = 'anbprtftsbdsgdam'
+app.config['MAIL_PASSWORD'] = ''
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 app.config['JWT_EXPIRATION_DELTA'] = datetime.timedelta(days=3)
@@ -157,7 +157,7 @@ def addresses(id=None):
             db.session.commit()
             return jsonify({"message":"object deleted"}), 200
 
-@app.route('/sendmail', methods=['POST'])
+@app.route('/sendmail', methods=['GET'])
 def sendmail():
     msg = Message('Hello', 
         sender = 'ljavierrodriguez@gmail.com', 
